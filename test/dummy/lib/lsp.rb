@@ -1,6 +1,8 @@
 # typed: true
 # frozen_string_literal: true
 
+# https://github.com/Shopify/team-ruby-dx/issues/1106
+
 # How to start:
 #   bin/rails runner test/dummy/lib/lsp.rb
 #
@@ -18,6 +20,7 @@ class Lsp
       server.mount_proc("/") do |req, res|
         model_name = req.path.gsub(BASE_PATH + "models/", "")
         const = ActiveSupport::Inflector.safe_constantize(model_name)
+        # TODO: check if this picks up new tables without having to restart
         if const && const < ActiveRecord::Base
           begin
             schema_file = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(const.connection.pool.db_config)
