@@ -37,7 +37,7 @@ module RubyLsp
 
       test "instantiation finds the right directory when bundle gemfile points to .ruby-lsp" do
         previous_bundle_gemfile = ENV["BUNDLE_GEMFILE"]
-        project_root = Pathname.new(previous_bundle_gemfile).dirname
+        project_root = File.expand_path("../..", __dir__)
 
         ENV["BUNDLE_GEMFILE"] = "#{project_root}/.ruby-lsp/Gemfile"
         assert_equal("#{project_root}/test/dummy", RailsClient.new.root.to_s)
