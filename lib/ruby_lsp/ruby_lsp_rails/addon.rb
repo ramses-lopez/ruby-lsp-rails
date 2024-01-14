@@ -47,18 +47,6 @@ module RubyLsp
         # read_response(request)
       end
 
-      def read_response(request)
-        Timeout.timeout(5) do
-          # Read headers until line breaks
-          headers = @stdout.gets("\r\n\r\n")
-          # Read the response content based on the length received in the headers
-          raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
-          JSON.parse(raw_response, symbolize_names: true)
-        end
-      rescue Timeout::Error
-        raise "Request #{request} timed out. Is the request returning a response?"
-      end
-
       def send_request(request, params = nil)
         hash = {
           id: rand(100),
@@ -69,6 +57,18 @@ module RubyLsp
         json = hash.to_json
         # @stdin.write("Content-Length: #{json.length}\r\n\r\n#{json}")
         @stdin.write(json)
+      end
+
+      def read_response(request)
+        Timeout.timeout(5) do
+          # Read headers until line breaks
+          headers = @stdout.gets("\r\n\r\n")
+          # Read the response content based on the length received in the headers
+          raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
+          JSON.parse(raw_response, symbolize_names: true)
+        end
+      rescue Timeout::Error
+        raise "Request #{request} timed out. Is the request returning a response?"
       end
 
       # Creates a new CodeLens listener. This method is invoked on every CodeLens request
