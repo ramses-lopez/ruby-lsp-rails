@@ -41,7 +41,7 @@ module RubyLsp
 
       def make_request(request, params = nil)
         send_request(request, params)
-        # read_response(request)
+        read_response(request)
       end
 
       def send_request(request, params = nil)
@@ -54,16 +54,18 @@ module RubyLsp
         json = hash.to_json
         @stdin.write("Content-Length: #{json.length}\r\n\r\n")
         @stdin.write(json)
-        warn(@stderr.read)
       end
 
       def read_response(request)
         Timeout.timeout(5) do
           # Read headers until line breaks
           headers = @stdout.gets("\r\n\r\n")
+
           # Read the response content based on the length received in the headers
           raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
-          JSON.parse(raw_response, symbolize_names: true)
+
+          json = JSON.parse(raw_response, symbolize_names: true)
+          warn("*** response ***: #{json}")
         end
       rescue Timeout::Error
         raise "Request #{request} timed out. Is the request returning a response?"
