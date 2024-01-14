@@ -10,7 +10,7 @@ while running
   request = $stdin.read(headers[/Content-Length: (\d+)/i, 1].to_i)
   json = JSON.parse(request, symbolize_names: true)
   request_route = json.fetch(:route)
-  # params = json.fetch(:params)
+  # params = json[:params]
   case request_route
   when "shutdown"
     warn("cols: #{User.column_names}")

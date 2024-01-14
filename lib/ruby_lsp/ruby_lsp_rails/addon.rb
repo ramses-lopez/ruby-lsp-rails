@@ -40,23 +40,21 @@ module RubyLsp
       end
 
       def make_request(request, params = nil)
-        json = { route: "shutdown" }.to_json
-        @stdin.write("Content-Length: #{json.length}\r\n\r\n#{json}")
-        warn(@stderr.read)
-        # send_request(request, params)
+        send_request(request, params)
         # read_response(request)
       end
 
       def send_request(request, params = nil)
         hash = {
           id: rand(100),
-          method: request,
+          route: request,
         }
 
         hash[:params] = params if params
         json = hash.to_json
-        # @stdin.write("Content-Length: #{json.length}\r\n\r\n#{json}")
+        @stdin.write("Content-Length: #{json.length}\r\n\r\n")
         @stdin.write(json)
+        warn(@stderr.read)
       end
 
       def read_response(request)
