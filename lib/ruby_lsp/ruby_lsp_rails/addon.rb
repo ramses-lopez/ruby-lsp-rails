@@ -22,7 +22,6 @@ module RubyLsp
       def activate(message_queue)
         client.check_if_server_is_running!
         @stdin, @stdout, @stderr, @wait_thread = Open3.popen3("bin/rails runner lib/ruby_lsp/ruby_lsp_rails/server.rb")
-        warn("wait thread status = #{@wait_thread.status}")
 
         @stdin.binmode
         @stdout.binmode
@@ -30,10 +29,8 @@ module RubyLsp
 
       sig { override.void }
       def deactivate
-        # TODO: send request to shutdown, verify thread is closed
         make_request("shutdown")
 
-        # Make sure IOs are closed
         @stdin.close
         @stdout.close
         @stderr.close
