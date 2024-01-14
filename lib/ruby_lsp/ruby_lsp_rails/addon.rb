@@ -31,10 +31,7 @@ module RubyLsp
       sig { override.void }
       def deactivate
         # TODO: send request to shutdown, verify thread is closed
-        json = { route: "shutdown" }.to_json
-        @stdin.write("Content-Length: #{json.length}\r\n\r\n#{json}")
-        warn(@stderr.read)
-        # make_request("shutdown)
+        make_request("shutdown")
 
         # Make sure IOs are closed
         @stdin.close
@@ -43,8 +40,11 @@ module RubyLsp
       end
 
       def make_request(request, params = nil)
-        send_request(request, params)
-        read_response(request)
+        json = { route: "shutdown" }.to_json
+        @stdin.write("Content-Length: #{json.length}\r\n\r\n#{json}")
+        warn(@stderr.read)
+        # send_request(request, params)
+        # read_response(request)
       end
 
       def read_response(request)
