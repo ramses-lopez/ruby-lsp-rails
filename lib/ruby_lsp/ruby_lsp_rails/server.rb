@@ -3,6 +3,27 @@
 
 require "json"
 
+# DO WITHIN CLASS?
+$stdin.sync = true
+$stdout.sync = true
+
+# TODO: move into a class/module
+def resolve_database_info_from_model(model_name)
+  const = ActiveSupport::Inflector.safe_constantize(model_name)
+  return unless const && const < ActiveRecord::Base
+
+  begin
+    schema_file = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(const.connection.pool.db_config)
+  rescue => e
+    warn("Could not locate schema: #{e.message}")
+  end
+
+  {
+    columns: const.columns.map { |column| [column.name, column.type] },
+    schema_file: schema_file,
+  }.to_json # why not JSON.dump?
+end
+
 running = true
 while running
   # Read headers until line breaks
@@ -14,18 +35,24 @@ while running
   json = JSON.parse(request, symbolize_names: true)
 
   request_method = json.fetch(:method)
+
   params = json[:params]
 
   response_json = nil
   case request_method
-  when "schema"
-    response_json = { result: "ok", columns: User.column_names }.to_json
   when "shutdown"
     response_json = { result: "ok" }.to_json
 
     running = false
+  when "models"
+    model_name = params # [:name]
+    response_json = resolve_database_info_from_model(model_name).to_json
+    $stdout.write("Content-Length: #{response_json.length}\r\n\r\n#{response_json}")
+    # $stdout.write(response_json)
+    # $stdout.flush # close_write
+    # $stdout.close
+    # running = false # TEmPORARY!
   end
 
-  $stdout.write("Content-Length: #{response_json.length}\r\n\r\n")
-  $stdout.write(response_json)
+  # $stdout.close
 end

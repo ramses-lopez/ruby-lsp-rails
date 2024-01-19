@@ -27,7 +27,7 @@ module RubyLsp
 
       sig do
         params(
-          client: RailsClient,
+          client: RunnerClient,
           nesting: T::Array[String],
           index: RubyIndexer::Index,
           dispatcher: Prism::Dispatcher,

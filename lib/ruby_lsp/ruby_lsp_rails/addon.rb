@@ -6,6 +6,7 @@ require "ruby_lsp/addon"
 require_relative "rails_client"
 require_relative "hover"
 require_relative "code_lens"
+require_relative "runner_client"
 require "open3"
 
 module RubyLsp
@@ -18,52 +19,20 @@ module RubyLsp
         @client ||= T.let(RailsClient.new, T.nilable(RailsClient))
       end
 
+      # sig { returns(RubyLsp::Rails::RunnerClient) }
+      # def runner_client
+      #   @runner_client ||= T.let(RunnerClient.new, T.nilable(RunnerClient))
+      # end
+
       sig { override.params(message_queue: Thread::Queue).void }
       def activate(message_queue)
-        client.check_if_server_is_running!
-        @stdin, @stdout, @stderr, @wait_thread = Open3.popen3("bin/rails", "runner", "#{__dir__}/server.rb")
-
-        @stdin.binmode
-        @stdout.binmode
+        # client.check_if_server_is_running!
+        @runner_client ||= T.let(RunnerClient.new, T.nilable(RunnerClient))
       end
 
       sig { override.void }
       def deactivate
-        send_request("shutdown")
-
-        @stdin.close
-        @stdout.close
-        @stderr.close
-      end
-
-      def make_request(request, params = nil)
-        send_request(request, params)
-        read_response(request)
-      end
-
-      def send_request(request, params = nil)
-        hash = {
-          method: request,
-        }
-
-        hash[:params] = params if params
-        json = hash.to_json
-        @stdin.write("Content-Length: #{json.length}\r\n\r\n", json)
-      end
-
-      def read_response(request)
-        Timeout.timeout(5) do
-          # Read headers until line breaks
-          headers = @stdout.gets("\r\n\r\n")
-
-          # Read the response content based on the length received in the headers
-          raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
-
-          json = JSON.parse(raw_response, symbolize_names: true)
-          warn("*** response ***: #{json}")
-        end
-      rescue Timeout::Error
-        raise "Request #{request} timed out. Is the request returning a response?"
+        T.must(@runner_client).shutdown
       end
 
       # Creates a new CodeLens listener. This method is invoked on every CodeLens request
@@ -85,7 +54,7 @@ module RubyLsp
         ).returns(T.nilable(Listener[T.nilable(Interface::Hover)]))
       end
       def create_hover_listener(nesting, index, dispatcher)
-        Hover.new(client, nesting, index, dispatcher)
+        Hover.new(T.must(@runner_client), nesting, index, dispatcher)
       end
 
       sig { override.returns(String) }
