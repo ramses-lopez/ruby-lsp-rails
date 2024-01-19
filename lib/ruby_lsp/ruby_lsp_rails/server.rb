@@ -1,9 +1,9 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 require "json"
+require "sorbet-runtime"
 
-# DO WITHIN CLASS?
 $stdin.sync = true
 $stdout.sync = true
 
@@ -24,18 +24,13 @@ def resolve_database_info_from_model(model_name)
   })
 end
 
-running = true
+running = T.let(true, T::Boolean)
 while running
-  # Read headers until line breaks
   headers = $stdin.gets("\r\n\r\n")
-
-  # Read the response content based on the length received in the headers
   request = $stdin.read(headers[/Content-Length: (\d+)/i, 1].to_i)
 
   json = JSON.parse(request, symbolize_names: true)
-
   request_method = json.fetch(:method)
-
   params = json[:params]
 
   response_json = nil
@@ -47,6 +42,4 @@ while running
     response_json = resolve_database_info_from_model(model_name).to_json
     $stdout.write("Content-Length: #{response_json.length}\r\n\r\n#{response_json}")
   end
-
-  # $stdout.close
 end
