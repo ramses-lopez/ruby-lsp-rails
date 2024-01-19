@@ -18,10 +18,10 @@ def resolve_database_info_from_model(model_name)
     warn("Could not locate schema: #{e.message}")
   end
 
-  {
+  JSON.dump({
     columns: const.columns.map { |column| [column.name, column.type] },
     schema_file: schema_file,
-  }.to_json # why not JSON.dump?
+  })
 end
 
 running = true
@@ -45,7 +45,7 @@ while running
 
     running = false
   when "models"
-    model_name = params # [:name]
+    model_name = "User" # params # [:name]
     response_json = resolve_database_info_from_model(model_name).to_json
     $stdout.write("Content-Length: #{response_json.length}\r\n\r\n#{response_json}")
     # $stdout.write(response_json)

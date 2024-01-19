@@ -87,13 +87,14 @@ module RubyLsp
 
       sig { params(name: String).returns(T.nilable(String)) }
       def generate_column_content(name)
-        model = @client.model(name)
-        return if model.nil?
+        model = JSON.parse(@client.model(name), symbolize_names: true) # or symbolize_keys??
+        warn("***model parsed**: #{model}")
+        # return if model.nil?
 
-        schema_file = model[:schema_file]
+        schema_file = model.fetch(:schema_file)
         content = +""
         content << "[Schema](#{URI::Generic.build(scheme: "file", path: schema_file)})\n\n" if schema_file
-        content << model[:columns].map { |name, type| "**#{name}**: #{type}\n" }.join("\n")
+        content << model.fetch(:columns).map { |name, type| "**#{name}**: #{type}\n" }.join("\n")
         content
       end
 
