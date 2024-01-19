@@ -7,7 +7,6 @@ require_relative "rails_client"
 require_relative "hover"
 require_relative "code_lens"
 require_relative "runner_client"
-require "open3"
 
 module RubyLsp
   module Rails
