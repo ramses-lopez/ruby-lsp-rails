@@ -87,9 +87,8 @@ module RubyLsp
 
       sig { params(name: String).returns(T.nilable(String)) }
       def generate_column_content(name)
-        model = JSON.parse(@client.model(name), symbolize_names: true) # or symbolize_keys??
-        warn("***model parsed**: #{model}")
-        # return if model.nil?
+        model = JSON.parse(@client.model(name), symbolize_names: true)
+        return if model.nil?
 
         schema_file = model.fetch(:schema_file)
         content = +""

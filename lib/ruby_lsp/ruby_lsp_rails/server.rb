@@ -41,17 +41,11 @@ while running
   response_json = nil
   case request_method
   when "shutdown"
-    response_json = { result: "ok" }.to_json
-
     running = false
   when "models"
-    model_name = "User" # params # [:name]
+    model_name = params.fetch(:name) # "User" # TODO: fix
     response_json = resolve_database_info_from_model(model_name).to_json
     $stdout.write("Content-Length: #{response_json.length}\r\n\r\n#{response_json}")
-    # $stdout.write(response_json)
-    # $stdout.flush # close_write
-    # $stdout.close
-    # running = false # TEmPORARY!
   end
 
   # $stdout.close
