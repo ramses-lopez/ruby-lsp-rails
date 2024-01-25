@@ -24,7 +24,7 @@ def resolve_database_info_from_model(model_name)
   })
 end
 
-running = T.let(true, T::Boolean)
+running = true # T.let(true, T::Boolean)
 while running
   headers = $stdin.gets("\r\n\r\n")
   request = $stdin.read(headers[/Content-Length: (\d+)/i, 1].to_i)
