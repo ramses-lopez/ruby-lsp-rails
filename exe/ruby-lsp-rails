@@ -10,6 +10,7 @@ module RubyLsp
   module Rails
     class << self
       extend T::Sig
+
       sig { params(model_name: String).returns(T.nilable(String)) }
       def resolve_database_info_from_model(model_name)
         const = ActiveSupport::Inflector.safe_constantize(model_name)
