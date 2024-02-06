@@ -21,6 +21,10 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "LICENSE.txt", "Rakefile", "README.md"]
   end
 
+  spec.bindir = "exe"
+  # spec.executables = ["ruby-lsp-rails"]
+  spec.executables = ["server.rb"]
+
   spec.add_dependency("actionpack", ">= 6.0")
   spec.add_dependency("activerecord", ">= 6.0")
   spec.add_dependency("railties", ">= 6.0")

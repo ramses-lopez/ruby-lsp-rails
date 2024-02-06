@@ -15,7 +15,11 @@ module RubyLsp
         @stdout = T.let(@stdout, T.nilable(IO))
         @stderr = T.let(@stderr, T.nilable(IO))
         @wait_thread = T.let(@stdin, T.untyped)
-        @stdin, @stdout, @stderr, @wait_thread = Open3.popen3("bin/rails", "runner", "#{__dir__}/server.rb")
+        @stdin, @stdout, @stderr, @wait_thread = Open3.popen3(
+          "bin/rails",
+          "runner",
+          "#{__dir__}/../../../exe/ruby-lsp-rails",
+        )
         @stdin.binmode # for Windows compatibility
         @stdout.binmode # for Windows compatibility
       end
