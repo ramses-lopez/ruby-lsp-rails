@@ -13,7 +13,7 @@ module RubyLsp
   module Rails
     class << self
       extend T::Sig
-      sig { params(model_name: String).returns(T.nilable(T::Hash[String, T.untyped])) }
+      sig { params(model_name: String).returns(T.nilable(String)) }
       def resolve_database_info_from_model(model_name)
         const = ActiveSupport::Inflector.safe_constantize(model_name)
         return unless const && const < ActiveRecord::Base
@@ -32,7 +32,7 @@ module RubyLsp
 
       sig { void }
       def start
-        running = T.let(true, T::Boolean)
+        running = true # T.let(true, T::Boolean)
 
         while running
           headers = $stdin.gets("\r\n\r\n")
