@@ -18,7 +18,7 @@ module RubyLsp
         @stdin, @stdout, @stderr, @wait_thread = Open3.popen3(
           "bin/rails",
           "runner",
-          "#{__dir__}/../../../exe/ruby-lsp-rails",
+          "#{__dir__}/server.rb",
         )
         @stdin.binmode # for Windows compatibility
         @stdout.binmode # for Windows compatibility
