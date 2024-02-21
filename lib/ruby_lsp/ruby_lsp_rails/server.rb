@@ -43,7 +43,7 @@ module RubyLsp
             schema_file: ::Rails.root + schema_file,
           },
         }
-      rescue => e
+      rescue Exception => e
         {
           error: e.message,
         }
