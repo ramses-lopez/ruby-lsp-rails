@@ -12,9 +12,17 @@ module RubyLsp
     class Addon < ::RubyLsp::Addon
       extend T::Sig
 
+      sig { void }
+      def initialize
+        super
+        @mutex = T.let(Mutex.new, Mutex)
+      end
+
       sig { returns(RunnerClient) }
       def client
-        @client ||= T.let(RunnerClient.create_client, T.nilable(RunnerClient))
+        @mutex.synchronize do
+          @client ||= T.let(RunnerClient.create_client, T.nilable(RunnerClient))
+        end
       end
 
       sig { override.params(message_queue: Thread::Queue).void }
