@@ -36,6 +36,7 @@ module RubyLsp
           # If we can't set the session ID, continue
         end
 
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client", mode: "a+")
         stdin, stdout, stderr, wait_thread = Open3.popen3(
           "bin/rails",
           "runner",
@@ -85,6 +86,7 @@ module RubyLsp
         ).returns(T.nilable(T::Hash[Symbol, T.untyped]))
       end
       def make_request(request, params = nil)
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***making request from client", mode: "a+")
         send_message(request, params)
         read_response
       end
@@ -95,6 +97,7 @@ module RubyLsp
         message[:params] = params if params
         json = message.to_json
 
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***sending: #{json}", mode: "a+")
         @stdin.write("Content-Length: #{json.length}\r\n\r\n", json)
       end
 
@@ -102,8 +105,12 @@ module RubyLsp
 
       sig { returns(T.nilable(T::Hash[Symbol, T.untyped])) }
       def read_response
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***reading response: #{json}", mode: "a+")
+
         headers = @stdout.gets("\r\n\r\n")
         raise IncompleteMessageError unless headers
+
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***after raise", mode: "a+")
 
         raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
         response = JSON.parse(T.must(raw_response), symbolize_names: true)

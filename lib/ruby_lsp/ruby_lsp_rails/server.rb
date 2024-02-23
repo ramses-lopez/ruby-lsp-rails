@@ -49,7 +49,7 @@ module RubyLsp
 
           request = JSON.parse(json, symbolize_names: true)
           response = execute(request.fetch(:method), request[:params])
-          File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***next because voidile loop", mode: "a+")
+          File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***next because void", mode: "a+")
           next if response == VOID
 
           File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "**** after next", mode: "a+")
