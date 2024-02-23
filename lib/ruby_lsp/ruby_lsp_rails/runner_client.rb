@@ -113,6 +113,9 @@ module RubyLsp
         File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***reading response", mode: "a+")
 
         headers = @stdout.gets("\r\n\r\n")
+        unless headers
+          File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "no headers so raising", mode: "a+")
+        end
         raise IncompleteMessageError unless headers
 
         File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***after raise", mode: "a+")
