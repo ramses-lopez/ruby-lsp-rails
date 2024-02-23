@@ -86,6 +86,7 @@ module RubyLsp
 
       sig { params(model_name: String).returns(T::Hash[Symbol, T.untyped]) }
       def resolve_database_info_from_model(model_name)
+        warn("---resolve")
         File.write(
           "/home/spin/src/github.com/Shopify/shopify/lsp.txt",
           "***resolve_database_info_from_model",
@@ -93,6 +94,7 @@ module RubyLsp
         )
         const = ActiveSupport::Inflector.safe_constantize(model_name)
         unless const && defined?(ActiveRecord) && const < ActiveRecord::Base && !const.abstract_class?
+          warn("---nope")
           return {
             result: nil,
           }
