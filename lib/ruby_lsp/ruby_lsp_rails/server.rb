@@ -49,6 +49,7 @@ module RubyLsp
 
           request = JSON.parse(json, symbolize_names: true)
           response = execute(request.fetch(:method), request[:params])
+          File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***next because voidile loop", mode: "a+")
           next if response == VOID
 
           File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "**** after next", mode: "a+")
@@ -73,9 +74,11 @@ module RubyLsp
           File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***model")
           resolve_database_info_from_model(params.fetch(:name))
         else
+          File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***else...")
           VOID
         end
       rescue => e
+        File.write("/home/spin/src/github.com/Shopify/shopify/lsp.txt", "***rescue...")
         { error: e.full_message(highlight: false) }
       end
 
