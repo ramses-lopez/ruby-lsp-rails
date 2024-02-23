@@ -121,6 +121,7 @@ module RubyLsp
         File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***after raise", mode: "a+")
 
         raw_response = @stdout.read(headers[/Content-Length: (\d+)/i, 1].to_i)
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "got response: #{raw_response}", mode: "a+")
         response = JSON.parse(T.must(raw_response), symbolize_names: true)
 
         if response[:error]
@@ -128,7 +129,9 @@ module RubyLsp
           return
         end
 
-        response.fetch(:result)
+        r = response.fetch(:result)
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "result: #{r}", mode: "a+")
+        r
       end
     end
 
