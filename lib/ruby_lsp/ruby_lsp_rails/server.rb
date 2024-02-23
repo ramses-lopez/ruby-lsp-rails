@@ -38,12 +38,12 @@ module RubyLsp
 
       sig { void }
       def start
-        Rails.logger.info("***start")
+        File.write("lsp.txt", "***start", mode: "a+")
         initialize_result = { result: { message: "ok" } }.to_json
         $stdout.write("Content-Length: #{initialize_result.length}\r\n\r\n#{initialize_result}")
 
         while @running
-          Rails.logger.info("***In while loop")
+          File.write("lsp.txt", "***In while loop", mode: "a+")
           headers = $stdin.gets("\r\n\r\n")
           json = $stdin.read(headers[/Content-Length: (\d+)/i, 1].to_i)
 
@@ -51,7 +51,7 @@ module RubyLsp
           response = execute(request.fetch(:method), request[:params])
           next if response == VOID
 
-          Rails.logger.info("**** after next")
+          File.write("lsp.txt", "**** after next", mode: "a+")
 
           json_response = response.to_json
           $stdout.write("Content-Length: #{json_response.length}\r\n\r\n#{json_response}")
@@ -70,7 +70,7 @@ module RubyLsp
           @running = false
           VOID
         when "model"
-          Rails.logger.info("***model")
+          File.write("lsp.txt", "***model")
           resolve_database_info_from_model(params.fetch(:name))
         else
           VOID
@@ -83,14 +83,14 @@ module RubyLsp
 
       sig { params(model_name: String).returns(T::Hash[Symbol, T.untyped]) }
       def resolve_database_info_from_model(model_name)
-        Rails.logger.info("***resolve_database_info_from_model")
+        File.write("lsp.txt", "***resolve_database_info_from_model", mode: "a+")
         const = ActiveSupport::Inflector.safe_constantize(model_name)
         unless const && defined?(ActiveRecord) && const < ActiveRecord::Base && !const.abstract_class?
           return {
             result: nil,
           }
         end
-        Rails.logger.info("*** 111")
+        File.write("lsp.txt", "*** 111", mode: "a+")
 
         info = {
           result: {
@@ -103,10 +103,10 @@ module RubyLsp
             ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(const.connection.pool.db_config)
 
         end
-        Rails.logger.info("*** 222")
+        File.write("lsp.txt", "*** 222", mode: "a+")
         info
       rescue => e
-        Rails.logger.info("*** rescue")
+        File.write("lsp.txt", "*** rescue", mode: "a+")
         { error: e.full_message(highlight: false) }
       end
     end
