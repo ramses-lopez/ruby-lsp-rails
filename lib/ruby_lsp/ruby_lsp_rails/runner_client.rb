@@ -43,15 +43,20 @@ module RubyLsp
           "#{__dir__}/server.rb",
           "start",
         )
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client1", mode: "a+")
         @stdin = T.let(stdin, IO)
         @stdout = T.let(stdout, IO)
         @stderr = T.let(stderr, IO)
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client2", mode: "a+")
         @wait_thread = T.let(wait_thread, Process::Waiter)
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client3", mode: "a+")
         @stdin.binmode # for Windows compatibility
         @stdout.binmode # for Windows compatibility
 
         warn("Ruby LSP Rails booting server")
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client4", mode: "a+")
         read_response
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***starting client5", mode: "a+")
         warn("Finished booting Ruby LSP Rails server")
       rescue Errno::EPIPE, IncompleteMessageError
         raise InitializationError, @stderr.read
@@ -105,7 +110,7 @@ module RubyLsp
 
       sig { returns(T.nilable(T::Hash[Symbol, T.untyped])) }
       def read_response
-        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***reading response: #{json}", mode: "a+")
+        File.write("/home/spin/src/github.com/Shopify/shopify/client.txt", "***reading response", mode: "a+")
 
         headers = @stdout.gets("\r\n\r\n")
         raise IncompleteMessageError unless headers
