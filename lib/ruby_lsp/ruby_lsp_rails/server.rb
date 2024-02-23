@@ -38,16 +38,20 @@ module RubyLsp
 
       sig { void }
       def start
+        Rails.logger.info("***start")
         initialize_result = { result: { message: "ok" } }.to_json
         $stdout.write("Content-Length: #{initialize_result.length}\r\n\r\n#{initialize_result}")
 
         while @running
+          Rails.logger.info("***In while loop")
           headers = $stdin.gets("\r\n\r\n")
           json = $stdin.read(headers[/Content-Length: (\d+)/i, 1].to_i)
 
           request = JSON.parse(json, symbolize_names: true)
           response = execute(request.fetch(:method), request[:params])
           next if response == VOID
+
+          Rails.logger.info("**** after next")
 
           json_response = response.to_json
           $stdout.write("Content-Length: #{json_response.length}\r\n\r\n#{json_response}")
@@ -66,6 +70,7 @@ module RubyLsp
           @running = false
           VOID
         when "model"
+          Rails.logger.info("***model")
           resolve_database_info_from_model(params.fetch(:name))
         else
           VOID
@@ -78,12 +83,14 @@ module RubyLsp
 
       sig { params(model_name: String).returns(T::Hash[Symbol, T.untyped]) }
       def resolve_database_info_from_model(model_name)
+        Rails.logger.info("***resolve_database_info_from_model")
         const = ActiveSupport::Inflector.safe_constantize(model_name)
         unless const && defined?(ActiveRecord) && const < ActiveRecord::Base && !const.abstract_class?
           return {
             result: nil,
           }
         end
+        Rails.logger.info("*** 111")
 
         info = {
           result: {
@@ -96,8 +103,10 @@ module RubyLsp
             ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(const.connection.pool.db_config)
 
         end
+        Rails.logger.info("*** 222")
         info
       rescue => e
+        Rails.logger.info("*** rescue")
         { error: e.full_message(highlight: false) }
       end
     end
