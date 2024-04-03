@@ -45,14 +45,13 @@ module RubyLsp
       end
 
       test "return column information for namespaced models" do
-        # TODO: not yet working
         response = hover_on_source(<<~RUBY, { line: 4, character: 6 })
           module Blog
-            class User < ApplicationRecord
+            class Post < ApplicationRecord
             end
           end
 
-          Blog::User
+          Blog::Post
         RUBY
 
         assert_equal(<<~CONTENT.chomp, response.contents.value)
@@ -60,11 +59,9 @@ module RubyLsp
 
           **id**: integer
 
-          **first_name**: string
+          **title**: string
 
-          **last_name**: string
-
-          **age**: integer
+          **body**: text
 
           **created_at**: datetime
 
