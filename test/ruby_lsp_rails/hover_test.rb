@@ -45,20 +45,7 @@ module RubyLsp
       end
 
       test "return column information for namespaced models" do
-        expected_response = {
-          schema_file: "#{dummy_root}/db/schema.rb",
-          columns: [
-            ["id", "integer"],
-            ["first_name", "string"],
-            ["last_name", "string"],
-            ["age", "integer"],
-            ["created_at", "datetime"],
-            ["updated_at", "datetime"],
-          ],
-        }
-
-        RunnerClient.any_instance.stubs(model: expected_response)
-
+        # TODO: not yet working
         response = hover_on_source(<<~RUBY, { line: 4, character: 6 })
           module Blog
             class User < ApplicationRecord
@@ -86,12 +73,8 @@ module RubyLsp
       end
 
       test "handles `db/structure.sql` instead of `db/schema.rb`" do
-        expected_response = {
-          schema_file: "#{dummy_root}/db/structure.sql",
-          columns: [],
-        }
-
-        RunnerClient.any_instance.stubs(model: expected_response)
+        # TODO: not yet working
+        ActiveRecord::Tasks::DatabaseTasks.stubs(:schema_dump_path).returns("db/structure.sql")
 
         response = hover_on_source(<<~RUBY, { line: 3, character: 0 })
           class User < ApplicationRecord
@@ -107,12 +90,8 @@ module RubyLsp
       end
 
       test "handles neither `db/structure.sql` nor `db/schema.rb` being present" do
-        expected_response = {
-          schema_file: nil,
-          columns: [],
-        }
-
-        RunnerClient.any_instance.stubs(model: expected_response)
+        # TODO: Not yet working
+        ActiveRecord::Tasks::DatabaseTasks.stubs(:schema_dump_path).returns(nil)
 
         response = hover_on_source(<<~RUBY, { line: 3, character: 0 })
           class User < ApplicationRecord
