@@ -30,7 +30,9 @@ module RubyLsp
         @global_state = T.let(global_state, T.nilable(RubyLsp::GlobalState))
         $stderr.puts("Activating Ruby LSP Rails addon v#{VERSION}")
         # Start booting the real client in a background thread. Until this completes, the client will be a NullClient
-        Thread.new { @client = RunnerClient.create_client }
+        runner_thread = Thread.new { @client = RunnerClient.create_client }
+        # For tests, we want to wait for the client to be ready
+        runner_thread.join if ENV["RAILS_ENV"] == "test"
       end
 
       sig { override.void }

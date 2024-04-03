@@ -143,10 +143,6 @@ module RubyLsp
 
       def hover_on_source(source, position)
         with_server(source) do |server, uri|
-          while RubyLsp::Addon.addons.first.instance_variable_get(:@client).instance_of?(RubyLsp::Rails::NullClient)
-            Thread.pass
-          end
-
           server.process_message(
             id: 1,
             method: "textDocument/hover",
