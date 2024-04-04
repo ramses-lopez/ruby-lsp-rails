@@ -32,4 +32,9 @@ class ServerTest < ActiveSupport::TestCase
   ensure
     ActiveRecord::Tasks::DatabaseTasks.send(:alias_method, :schema_dump_path, :old_schema_dump_path)
   end
+
+  test "route location" do
+    response = @server.execute("route_location", { name: "user_path" })
+    assert_equal("config/routes.rb:5", response)
+  end
 end

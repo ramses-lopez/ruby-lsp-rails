@@ -95,6 +95,16 @@ module RubyLsp
         nil
       end
 
+      sig { params(name: String).returns(T.nilable(T::Hash[Symbol, T.untyped])) }
+      def route_location(name)
+        $stderr.puts("Ruby LSP Rails getting route location for: #{name}")
+        make_request("route_location", name: name)
+        # $stderr.puts("after")
+      rescue IncompleteMessageError
+        $stderr.puts("Ruby LSP Rails failed to get route location: #{@stderr.read}")
+        nil
+      end
+
       sig { void }
       def trigger_reload
         $stderr.puts("Reloading Rails application")
@@ -150,6 +160,7 @@ module RubyLsp
         raise EmptyMessageError if content_length.zero?
 
         raw_response = @stdout.read(content_length)
+        $stderr.puts("Ruby LSP Rails raw response: #{raw_response}")
         response = JSON.parse(T.must(raw_response), symbolize_names: true)
 
         if response[:error]
@@ -157,6 +168,8 @@ module RubyLsp
           return
         end
 
+        $stderr.puts("***")
+        $stderr.puts(response.fetch(:result))
         response.fetch(:result)
       end
     end

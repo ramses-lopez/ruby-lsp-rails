@@ -70,6 +70,10 @@ module RubyLsp
         when "reload"
           ::Rails.application.reloader.reload!
           VOID
+        when "route_location"
+          $stderr.puts("***params: #{params}")
+          name = T.must(params).fetch(:name).match(/^([a-z_]+)(_path|_url)$/)[1]
+          { result: { location: ::Rails.root.to_s + "/" + ::Rails.application.routes.named_routes.get(name).source_location } }
         else
           VOID
         end

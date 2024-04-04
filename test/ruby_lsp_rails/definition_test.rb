@@ -80,6 +80,25 @@ module RubyLsp
         assert_equal(14, response[1].range.end.character)
       end
 
+      test "..." do
+        response = generate_definitions_for_source(<<~RUBY, { line: 4, character: 20 })
+          # typed: false
+
+          class UserController < ActionController
+            def create
+              redirect_to users_path
+            end
+          end
+        RUBY
+
+        assert_equal(1, response.size)
+        assert_equal("file:///config/routes.rb", response[0].uri)
+        assert_equal(4, response[0].range.start.line)
+        assert_equal(0, response[0].range.start.character)
+        assert_equal(4, response[0].range.end.line)
+        assert_equal(0, response[0].range.end.character)
+      end
+
       private
 
       def generate_definitions_for_source(source, position)

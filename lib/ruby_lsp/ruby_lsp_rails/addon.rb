@@ -30,7 +30,8 @@ module RubyLsp
         @global_state = T.let(global_state, T.nilable(RubyLsp::GlobalState))
         $stderr.puts("Activating Ruby LSP Rails addon v#{VERSION}")
         # Start booting the real client in a background thread. Until this completes, the client will be a NullClient
-        Thread.new { @client = RunnerClient.create_client }
+        runner_thread = Thread.new { @client = RunnerClient.create_client }
+        runner_thread.join # if ENV["RAILS_ENV"] == "test"
       end
 
       sig { override.void }
@@ -83,7 +84,7 @@ module RubyLsp
       end
       def create_definition_listener(response_builder, uri, nesting, dispatcher)
         index = T.must(@global_state).index
-        Definition.new(response_builder, nesting, index, dispatcher)
+        Definition.new(@client, response_builder, nesting, index, dispatcher)
       end
 
       sig { params(changes: T::Array[{ uri: String, type: Integer }]).void }

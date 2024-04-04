@@ -23,13 +23,15 @@ module RubyLsp
 
       sig do
         params(
+          client: RunnerClient,
           response_builder: ResponseBuilders::CollectionResponseBuilder[Interface::Location],
           nesting: T::Array[String],
           index: RubyIndexer::Index,
           dispatcher: Prism::Dispatcher,
         ).void
       end
-      def initialize(response_builder, nesting, index, dispatcher)
+      def initialize(client, response_builder, nesting, index, dispatcher)
+        @client = client
         @response_builder = response_builder
         @nesting = nesting
         @index = index
@@ -39,12 +41,27 @@ module RubyLsp
 
       sig { params(node: Prism::CallNode).void }
       def on_call_node_enter(node)
-        return unless self_receiver?(node)
+        $stderr.puts "Definition#on_call_node_enter: #{node.message}"
+        # return unless self_receiver?(node)
 
         message = node.message
+        $stderr.puts "message: #{message}"
 
-        return unless message && Support::Callbacks::ALL.include?(message)
+        return unless message
 
+        message = "users_path"
+
+        # if Support::Callbacks::ALL.include?(message)
+        #   handle_callback(node)
+        # els
+        if message.match?(/^([a-z_]+)(_path|_url)$/) # check. what about digits?
+          $stderr.puts "handle_rooute #{node.message}"
+          handle_route(node)
+        end
+      end
+
+      sig { params(node: Prism::CallNode).void }
+      def handle_callback(node)
         arguments = node.arguments&.arguments
         return unless arguments&.any?
 
@@ -60,6 +77,24 @@ module RubyLsp
 
           collect_definitions(name)
         end
+      end
+
+      sig { params(node: T.untyped).void }
+      def handle_route(node)
+        $stderr.puts "node.message: #{node.message}"
+        # route = ::Rails.application.routes.named_routes.get(:users) # node.message)
+
+        file_path, line = @client.route_location("users_path").fetch(:location).split(":") # TODO: user node message)
+        $stderr.puts "111 done"
+
+        # TODO: don't need `end?`
+        @response_builder << Interface::Location.new(
+          uri: URI::Generic.from_path(path: file_path).to_s,
+          range: Interface::Range.new(
+            start: Interface::Position.new(line: Integer(line) - 1, character: 0),
+            end: Interface::Position.new(line: Integer(line) - 1, character: 0),
+          ),
+        )
       end
 
       private
