@@ -356,6 +356,19 @@ module RubyLsp
         assert_equal("belongs_to :baz", response[0].children[1].name)
       end
 
+      test "correctly handles scopes" do
+        response = generate_document_symbols_for_source(<<~RUBY)
+          class FooModel < ApplicationRecord
+            scope :foo, -> { where(foo: "bar") }
+          end
+        RUBY
+
+        assert_equal(1, response.size)
+        assert_equal("FooModel", response[0].name)
+        assert_equal(1, response[0].children.size)
+        assert_equal("scope :foo", response[0].children[0].name)
+      end
+
       private
 
       def generate_document_symbols_for_source(source)
